@@ -101,6 +101,17 @@
              android:text="湿度:57%"
              android:textColor="@android:color/white"
              android:textSize="15.0sp" />
+         <TextView
+             android:id="@+id/wendu"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignParentLeft="true"
+             android:layout_below="@id/time"
+             android:layout_marginLeft="15.0dip"
+             android:singleLine="true"
+             android:text="温度"
+             android:textColor="@android:color/white"
+             android:textSize="15.0sp" />
          <LinearLayout
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
