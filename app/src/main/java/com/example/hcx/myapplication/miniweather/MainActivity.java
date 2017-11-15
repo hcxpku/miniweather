@@ -1,4 +1,4 @@
-package com.example.hcx.myapplication;
+package com.example.hcx.myapplication.miniweather;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.View;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,10 +19,9 @@ import java.net.URL;
 import org.xmlpull.v1.*;
 import java.io.IOException;
 import java.io.StringReader;
-import com.example.hcx.myapplication.NetUtil;
-import com.example.hcx.myapplication.bean.TodayWeather;
 
-import static android.R.attr.data;
+import com.example.hcx.myapplication.R;
+import com.example.hcx.myapplication.bean.TodayWeather;
 
 /**
  * Created by hcx on 2017/9/28.
@@ -36,10 +34,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private ImageView mCitySelect;
 
     private TextView cityTv,timeTv,humidityTv,weekTv,pmDataTv,pmQualityTv,
-                       temperatureTv,climateTv,windTv,city_name_Tv;
+                       temperatureTv,climateTv,windTv,city_name_Tv,wenduTv;
     private ImageView weatherImg,pmImg;
+    //主线程增加Handler
     private Handler mHandler=new Handler(){
-        public void handleMassage(android.os.Message msg){
+        public void handleMessage(android.os.Message msg){
             switch(msg.what){
                 case UPDATE_TODAY_WEATHER:
                     updateTodayWeather((TodayWeather)msg.obj);
@@ -53,9 +52,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.weather_info);
+        setContentView(R.layout.weather_info);//加载布局文件
         mUpdateBtn=(ImageView)findViewById(R.id.title_update_btn);
         mUpdateBtn.setOnClickListener(this);
+        //测试网络连接
        if(NetUtil.getNetworkState(this)!=NetUtil.NETWORN_NONE){
            Log.d("myWeather","网络OK");
            Toast.makeText(MainActivity.this, "网络OK", Toast.LENGTH_SHORT).show();
@@ -68,6 +68,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         mCitySelect.setOnClickListener(this);
        initView();;
     }
+    //初始化页面信息
     void initView(){
         city_name_Tv=(TextView)findViewById(R.id.title_city_name);
         cityTv=(TextView)findViewById(R.id.city);
@@ -81,6 +82,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         climateTv=(TextView)findViewById(R.id.climate);
         windTv=(TextView)findViewById(R.id.wind);
         weatherImg=(ImageView)findViewById(R.id.weather_img);
+        wenduTv=(TextView)findViewById(R.id.wendu);
 
         city_name_Tv.setText("N/A");
         cityTv.setText("N/A");
@@ -92,6 +94,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         temperatureTv.setText("N/A");
         climateTv.setText("N/A");
         windTv.setText("N/A");
+        wenduTv.setText("N/A");
     }
 
     @Override
@@ -102,10 +105,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
             startActivityForResult(i,1);
         }
         if(view.getId()==R.id.title_update_btn){
-            SharedPreferences sharedPreFerences=getSharedPreferences("config",MODE_PRIVATE);
-            String cityCode=sharedPreFerences.getString("main_city_code","101010100");
+            SharedPreferences sharedPreferences=getSharedPreferences("config",MODE_PRIVATE);
+            String cityCode=sharedPreferences.getString("main_city_code","101010100");
             if(NetUtil.getNetworkState(this)!=NetUtil.NETWORN_NONE) {
-                Log.d("myWeather", "网络OK");
+                Log.d("myWeather", cityCode);
                 queryWeatherCode(cityCode);
             }
             else{
@@ -126,6 +129,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             }
         }
     }
+    //连接网络，获取数据
     private void queryWeatherCode(String cityCode)  {
         final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;
         Log.d("myWeather", address);
@@ -168,6 +172,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             }
         }).start();
     }
+    //解析数据
     private TodayWeather parseXML(String xmldata) {
         TodayWeather todayWeather = null;
         int fengxiangCount = 0;
@@ -211,7 +216,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
                             } else if (xmlPullParser.getName().equals("quality")) {
                                 eventType = xmlPullParser.next();
                                 todayWeather.setQuality(xmlPullParser.getText());
-                            } else if (xmlPullParser.getName().equals("fengxiang") && fengxiangCount == 0) {
+                            }else if (xmlPullParser.getName().equals("wendu")) {
+                                eventType = xmlPullParser.next();
+                                todayWeather.setWendu(xmlPullParser.getText());
+                            }
+                            else if (xmlPullParser.getName().equals("fengxiang") && fengxiangCount == 0) {
                                 eventType = xmlPullParser.next();
                                 todayWeather.setFengxiang(xmlPullParser.getText());
                                 fengxiangCount++;
@@ -222,6 +231,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                             } else if (xmlPullParser.getName().equals("date") && dateCount == 0) {
                                 eventType = xmlPullParser.next();
                                 todayWeather.setDate(xmlPullParser.getText());
+                                dateCount++;
                             } else if (xmlPullParser.getName().equals("high") && highCount == 0) {
                                 eventType = xmlPullParser.next();
                                 todayWeather.setHigh(xmlPullParser.getText());
@@ -249,7 +259,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
         return todayWeather;
     }
-    void updateTodayWeather(TodayWeather todayWeather){
+    //更新页面信息
+    public void updateTodayWeather(TodayWeather todayWeather){
+        Log.d("todayWeather","更新成功");
         city_name_Tv.setText(todayWeather.getCity()+"天气");
         cityTv.setText(todayWeather.getCity());
         timeTv.setText(todayWeather.getUpdatetime()+"发布");
@@ -260,8 +272,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
         temperatureTv.setText(todayWeather.getLow()+"~"+todayWeather.getHigh());
         climateTv.setText(todayWeather.getType());
         windTv.setText("风力： "+todayWeather.getFengli());
-        Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
+        wenduTv.setText("温度： "+todayWeather.getWendu());
 
+        Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
     }
 }
 

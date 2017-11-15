@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <!-- 顶部工具栏 -->
     <RelativeLayout
         android:id="@+id/title"
         android:layout_width="fill_parent"
@@ -55,13 +56,16 @@
             android:layout_toLeftOf="@id/title_share"
             android:src="@drawable/base_action_bar_action_city" />
     </RelativeLayout>
-
+    <!-- 今日天气 -->
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@id/title"
         android:background="@drawable/biz_plugin_weather_shenzhen_bg"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/title">
+
      <RelativeLayout
          android:layout_width="fill_parent"
          android:layout_height="wrap_content"
@@ -106,12 +110,13 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentLeft="true"
-             android:layout_below="@id/time"
+             android:layout_below="@id/humidity"
              android:layout_marginLeft="15.0dip"
              android:singleLine="true"
-             android:text="温度"
+             android:text="温度:2℃"
              android:textColor="@android:color/white"
              android:textSize="15.0sp" />
+         <!-- PM2.5-->
          <LinearLayout
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
@@ -167,7 +172,8 @@
                  android:textColor="@android:color/white"
                  android:textSize="20.0sp" />
          </LinearLayout>
-        <RelativeLayout
+         <!-- 今日天气详情 -->
+         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"

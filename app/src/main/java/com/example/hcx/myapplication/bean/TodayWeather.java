@@ -10,7 +10,7 @@ public class TodayWeather {
     private String wendu;
     private String shidu;
     private String pm25;
-    private String  quality;
+    private String quality;
     private String fengxiang;
     private String fengli;
     private String date;
